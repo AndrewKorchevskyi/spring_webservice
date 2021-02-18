@@ -1,4 +1,4 @@
-package com.simplewebservice.binarysearch;
+package com.simplewebservice.misc.binarysearch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
