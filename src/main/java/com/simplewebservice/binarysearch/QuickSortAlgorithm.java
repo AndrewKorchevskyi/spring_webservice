@@ -1,4 +1,4 @@
-package com.simplewebservice;
+package com.simplewebservice.binarysearch;
 
 import org.springframework.stereotype.Component;
 
