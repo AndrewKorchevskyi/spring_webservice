@@ -1,4 +1,4 @@
-package com.simplewebservice.misc.binarysearch;
+package other.binarysearch;
 
 public interface SortAlgorithm {
     int[] sort(int[] numbers);

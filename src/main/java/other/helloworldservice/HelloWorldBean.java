@@ -1,4 +1,4 @@
-package com.simplewebservice.misc.helloworldservice;
+package other.helloworldservice;
 
 public class HelloWorldBean {
 

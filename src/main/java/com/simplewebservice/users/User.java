@@ -1,4 +1,4 @@
-package com.simplewebservice;
+package com.simplewebservice.users;
 
 import java.util.Date;
 
