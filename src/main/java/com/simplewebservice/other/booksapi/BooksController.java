@@ -1,4 +1,4 @@
-package other.booksapi;
+package com.simplewebservice.other.booksapi;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
