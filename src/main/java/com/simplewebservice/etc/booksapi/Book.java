@@ -1,4 +1,4 @@
-package com.simplewebservice.other.booksapi;
+package com.simplewebservice.etc.booksapi;
 
 public class Book {
     int id;
