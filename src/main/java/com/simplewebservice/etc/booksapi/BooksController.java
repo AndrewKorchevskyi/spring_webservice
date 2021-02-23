@@ -1,4 +1,4 @@
-package com.simplewebservice;
+package com.simplewebservice.etc.booksapi;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
