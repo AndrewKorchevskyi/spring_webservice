@@ -1,17 +1,23 @@
 package com.simplewebservice.users;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@ApiModel(description = "User Details")
 public class User {
 
     private Integer id;
 
     @Size(min = 2, max = 20, message = "Name should have 2-20 characters")
+    @ApiModelProperty(notes = "Name should have 2-20 characters")
     private String name;
 
     @Past
+    @ApiModelProperty(notes = "Birth date must be before current date")
     private Date birthDate;
 
     public User(Integer id, String name, Date birthDate) {
