@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Locale;
 
+@ApiIgnore
 @RestController
 public class HelloWorldController {
 
