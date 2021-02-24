@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         User savedUser = userService.save(user);
 
         URI location = ServletUriComponentsBuilder
@@ -48,6 +48,12 @@ public class UserController {
                 .buildAndExpand(savedUser.getId()).toUri();
 
         return ResponseEntity.created(location).body(savedUser);
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable int id, @Valid @RequestBody User user) {
+        User savedUser = userService.updateById(id, user);
+        return ResponseEntity.ok().body(savedUser);
     }
 
     @DeleteMapping("/users/{id}")

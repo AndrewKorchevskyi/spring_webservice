@@ -1,5 +1,6 @@
 package com.simplewebservice.users;
 
+import com.simplewebservice.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -51,5 +52,15 @@ public class UserService {
             }
         }
         return null;
+    }
+
+    public User updateById(int id, User user) {
+        for (User currentUser : users) {
+            if (currentUser.getId() == id) {
+                currentUser = user;
+                return currentUser;
+            }
+        }
+        throw new UserNotFoundException("User to update was not found");
     }
 }
