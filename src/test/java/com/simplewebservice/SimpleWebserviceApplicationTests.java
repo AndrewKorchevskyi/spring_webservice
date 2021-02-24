@@ -24,7 +24,7 @@ public class SimpleWebserviceApplicationTests {
 
 	@Test
 	public void createUserWithGeneratedId() {
-		String testUserName = "Unit Tests User";
+		String testUserName = "UserWithGeneratedId";
 		Date testUserBirthDate = new Date();
 		User user = userController.createUser(new User(null, testUserName, testUserBirthDate)).getBody();
 		assertThat(user.getId()).isNotNull();
@@ -36,7 +36,7 @@ public class SimpleWebserviceApplicationTests {
 	@Test
 	public void createUserWithSpecifiedId() {
 		int testUserId = 666;
-		String testUserName = "Unit Tests User 2";
+		String testUserName = "UserWithSpecifiedId";
 		Date testUserBirthDate = new Date();
 		User user = userController.createUser(new User(testUserId, testUserName, testUserBirthDate)).getBody();
 		assertThat(user.getId()).isEqualTo(testUserId);
@@ -49,11 +49,11 @@ public class SimpleWebserviceApplicationTests {
 	public void updateUser() {
 		int testUserId = 747;
 
-		String testUserName = "Unit Tests User 3";
+		String testUserName = "InitialUserName";
 		Date testUserBirthDate = new Date();
 		userController.createUser(new User(testUserId, testUserName, testUserBirthDate));
 
-		testUserName = "Updated Name";
+		testUserName = "UpdatedUserName";
 		testUserBirthDate = new Date();
 		User user2 = new User(testUserId, testUserName, testUserBirthDate);
 		userController.updateUser(testUserId, user2);
@@ -69,7 +69,7 @@ public class SimpleWebserviceApplicationTests {
 	@Test
 	public void deleteUserById() {
 		int testUserId = 777;
-		User user = userController.createUser(new User(testUserId, "Unit Tests User 4", new Date())).getBody();
+		User user = userController.createUser(new User(testUserId, "UserToDelete", new Date())).getBody();
 		assertThat(userController.deleteUser(user.getId()).getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 	}
 }

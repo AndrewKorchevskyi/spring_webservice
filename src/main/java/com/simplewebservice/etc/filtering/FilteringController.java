@@ -25,7 +25,6 @@ public class FilteringController {
         MappingJacksonValue mapping = new MappingJacksonValue(book);
         mapping.setFilters(filterProvider);
 
-
         return mapping;
     }
 }
