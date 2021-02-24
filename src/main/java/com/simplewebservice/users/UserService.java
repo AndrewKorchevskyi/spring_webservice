@@ -57,7 +57,8 @@ public class UserService {
     public User updateById(int id, User user) {
         for (User currentUser : users) {
             if (currentUser.getId() == id) {
-                currentUser = user;
+                currentUser.setName(user.getName());
+                currentUser.setBirthDate(user.getBirthDate());
                 return currentUser;
             }
         }
