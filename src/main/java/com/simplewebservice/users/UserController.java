@@ -77,12 +77,21 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/posts")
-    public List<Post> retrieveAllPostsByUserId(@PathVariable int id) {
+    public List<Post> retrieveAllPosts(@PathVariable int id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " Not Found");
         }
         return user.get().getPosts();
+    }
+
+    @GetMapping("/users/{id}/posts/{post_id}")
+    public Post retrievePostById(@PathVariable int id, @PathVariable int post_id) {
+        Optional<Post> post = postRepository.findById(post_id);
+        if (post.isEmpty()) {
+            throw new UserNotFoundException("User with id " + id + " Not Found");
+        }
+        return post.get();
     }
 
     @PostMapping("/users/{id}/posts")
@@ -98,7 +107,24 @@ public class UserController {
                 .fromCurrentRequest()
                 .path("{id}")
                 .buildAndExpand(post.getId()).toUri();
-
         return ResponseEntity.created(location).body(post);
+    }
+
+    @PutMapping("/users/{id}/posts/{post_id}")
+    public ResponseEntity<Post> updatePost(@PathVariable int id, @PathVariable int post_id, @RequestBody Post post) {
+        Optional<Post> existingPost = postRepository.findById(post_id);
+        if (existingPost.isEmpty()) {
+            throw new UserNotFoundException("User with id " + id + " Not Found");
+        }
+        Post postToUpdate = existingPost.get();
+        postToUpdate.setDescription(post.getDescription());
+        postRepository.save(postToUpdate);
+        return ResponseEntity.ok().body(postToUpdate);
+    }
+
+    @DeleteMapping("/users/{id}/posts/{post_id}")
+    public ResponseEntity<Object> deletePost(@PathVariable int post_id) {
+        postRepository.deleteById(post_id);
+        return ResponseEntity.noContent().build();
     }
 }
