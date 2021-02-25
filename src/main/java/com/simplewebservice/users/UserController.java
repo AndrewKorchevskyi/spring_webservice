@@ -3,6 +3,7 @@ package com.simplewebservice.users;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.simplewebservice.exceptions.PostNotFoundException;
 import com.simplewebservice.exceptions.UserNotFoundException;
 import com.simplewebservice.posts.Post;
 import com.simplewebservice.posts.PostRepository;
@@ -86,12 +87,12 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/posts/{post_id}")
-    public Post retrievePostById(@PathVariable int id, @PathVariable int post_id) {
-        Optional<Post> post = postRepository.findById(post_id);
-        if (post.isEmpty()) {
-            throw new UserNotFoundException("User with id " + id + " Not Found");
+    public Post retrievePostById(@PathVariable int post_id) {
+        Optional<Post> existingPost = postRepository.findById(post_id);
+        if (existingPost.isEmpty()) {
+            throw new PostNotFoundException("Post with id " + post_id + " Not Found");
         }
-        return post.get();
+        return existingPost.get();
     }
 
     @PostMapping("/users/{id}/posts")
@@ -111,10 +112,10 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/posts/{post_id}")
-    public ResponseEntity<Post> updatePost(@PathVariable int id, @PathVariable int post_id, @RequestBody Post post) {
+    public ResponseEntity<Post> updatePost(@PathVariable int post_id, @RequestBody Post post) {
         Optional<Post> existingPost = postRepository.findById(post_id);
         if (existingPost.isEmpty()) {
-            throw new UserNotFoundException("User with id " + id + " Not Found");
+            throw new PostNotFoundException("Post with id " + post_id + " Not Found");
         }
         Post postToUpdate = existingPost.get();
         postToUpdate.setDescription(post.getDescription());
@@ -124,6 +125,10 @@ public class UserController {
 
     @DeleteMapping("/users/{id}/posts/{post_id}")
     public ResponseEntity<Object> deletePost(@PathVariable int post_id) {
+        Optional<Post> existingPost = postRepository.findById(post_id);
+        if (existingPost.isEmpty()) {
+            throw new PostNotFoundException("Post with id " + post_id + " Not Found");
+        }
         postRepository.deleteById(post_id);
         return ResponseEntity.noContent().build();
     }
