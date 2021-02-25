@@ -4,6 +4,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.simplewebservice.exceptions.UserNotFoundException;
+import com.simplewebservice.posts.Post;
+import com.simplewebservice.posts.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -21,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @GetMapping("/users")
     public List<User> retrieveAllUsers() {
@@ -69,5 +74,31 @@ public class UserController {
     public ResponseEntity<Object> deleteUser(@PathVariable int id) {
         userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{id}/posts")
+    public List<Post> retrieveAllPostsByUserId(@PathVariable int id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id " + id + " Not Found");
+        }
+        return user.get().getPosts();
+    }
+
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Post> createPost(@PathVariable int id, @RequestBody Post post) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id " + id + " Not Found");
+        }
+        User userToCreatePost = user.get();
+        post.setUser(userToCreatePost);
+        postRepository.save(post);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("{id}")
+                .buildAndExpand(post.getId()).toUri();
+
+        return ResponseEntity.created(location).body(post);
     }
 }
