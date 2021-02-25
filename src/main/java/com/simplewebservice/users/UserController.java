@@ -14,25 +14,26 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @GetMapping("/users")
     public List<User> retrieveAllUsers() {
-        return userService.findAll();
+        return userRepository.findAll();
     }
 
     @GetMapping("/users/{id}")
     public EntityModel<User> retrieveUser(@PathVariable int id) {
-        User user = userService.findOne(id);
-        if (user == null) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " Not Found");
         }
-        EntityModel<User> resource = EntityModel.of(user);
+        EntityModel<User> resource = EntityModel.of(user.get());
         WebMvcLinkBuilder linkBuilder = linkTo(methodOn(this.getClass()).retrieveAllUsers());
         resource.add(linkBuilder.withRel("all-users"));
         return resource;
@@ -40,7 +41,7 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User savedUser = userService.save(user);
+        User savedUser = userRepository.save(user);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -52,16 +53,21 @@ public class UserController {
 
     @PutMapping("/users/{id}")
     public ResponseEntity<User> updateUser(@PathVariable int id, @Valid @RequestBody User user) {
-        User savedUser = userService.updateById(id, user);
-        return ResponseEntity.ok().body(savedUser);
+        Optional<User> existingUser = userRepository.findById(id);
+        if (existingUser.isPresent()) {
+            User updatedUser = existingUser.get();
+            updatedUser.setName(user.getName());
+            updatedUser.setBirthDate(user.getBirthDate());
+            userRepository.save(updatedUser);
+            return ResponseEntity.ok().body(updatedUser);
+        } else {
+            throw new UserNotFoundException("User with id " + id + " Not Found");
+        }
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable int id) {
-        User user = userService.deleteById(id);
-        if (user == null) {
-            throw new UserNotFoundException("User with id " + id + " Not Found");
-        }
+        userRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

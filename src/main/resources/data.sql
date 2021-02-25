@@ -1,0 +1,3 @@
+insert into user values(111, sysdate(), 'Admin1')
+insert into user values(222, sysdate(), 'Admin2')
+insert into user values(333, sysdate(), 'Admin3')

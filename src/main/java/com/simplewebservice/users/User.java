@@ -3,15 +3,20 @@ package com.simplewebservice.users;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@Entity
 @ApiModel(description = "User Details")
 public class User {
 
-    @NotNull
+    @Id
+    @GeneratedValue
     private Integer id;
 
     @NotNull
@@ -23,18 +28,15 @@ public class User {
     @ApiModelProperty(notes = "Birth date must be before current date")
     private Date birthDate;
 
-    public User(Integer id, String name, Date birthDate) {
-        this.id = id;
+    public User() {}
+
+    public User(String name, Date birthDate) {
         this.name = name;
         this.birthDate = birthDate;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
