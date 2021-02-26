@@ -3,7 +3,10 @@ package com.simplewebservice.users;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import com.simplewebservice.exceptions.PostNotFoundException;
 import com.simplewebservice.exceptions.UserNotFoundException;
+import com.simplewebservice.posts.Post;
+import com.simplewebservice.posts.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -14,33 +17,37 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @GetMapping("/users")
     public List<User> retrieveAllUsers() {
-        return userService.findAll();
+        return userRepository.findAll();
     }
 
     @GetMapping("/users/{id}")
     public EntityModel<User> retrieveUser(@PathVariable int id) {
-        User user = userService.findOne(id);
-        if (user == null) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
             throw new UserNotFoundException("User with id " + id + " Not Found");
         }
-        EntityModel<User> resource = EntityModel.of(user);
+        EntityModel<User> resource = EntityModel.of(user.get());
         WebMvcLinkBuilder linkBuilder = linkTo(methodOn(this.getClass()).retrieveAllUsers());
         resource.add(linkBuilder.withRel("all-users"));
         return resource;
     }
 
     @PostMapping("/users")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
-        User savedUser = userService.save(user);
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+        User savedUser = userRepository.save(user);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -50,12 +57,79 @@ public class UserController {
         return ResponseEntity.created(location).body(savedUser);
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Object> deleteUser(@PathVariable int id) {
-        User user = userService.deleteById(id);
-        if (user == null) {
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable int id, @Valid @RequestBody User user) {
+        Optional<User> existingUser = userRepository.findById(id);
+        if (existingUser.isPresent()) {
+            User updatedUser = existingUser.get();
+            updatedUser.setName(user.getName());
+            updatedUser.setBirthDate(user.getBirthDate());
+            userRepository.save(updatedUser);
+            return ResponseEntity.ok().body(updatedUser);
+        } else {
             throw new UserNotFoundException("User with id " + id + " Not Found");
         }
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Object> deleteUser(@PathVariable int id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/{id}/posts")
+    public List<Post> retrieveAllPosts(@PathVariable int id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id " + id + " Not Found");
+        }
+        return user.get().getPosts();
+    }
+
+    @GetMapping("/users/{id}/posts/{post_id}")
+    public Post retrievePostById(@PathVariable int postId) {
+        Optional<Post> existingPost = postRepository.findById(postId);
+        if (existingPost.isEmpty()) {
+            throw new PostNotFoundException("Post with id " + postId + " Not Found");
+        }
+        return existingPost.get();
+    }
+
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Post> createPost(@PathVariable int userId, @RequestBody Post post) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User with id " + userId + " Not Found");
+        }
+        User userToCreatePost = user.get();
+        post.setUser(userToCreatePost);
+        postRepository.save(post);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("{id}")
+                .buildAndExpand(post.getId()).toUri();
+        return ResponseEntity.created(location).body(post);
+    }
+
+    @PutMapping("/users/{id}/posts/{post_id}")
+    public ResponseEntity<Post> updatePost(@PathVariable int postId, @RequestBody Post post) {
+        Optional<Post> existingPost = postRepository.findById(postId);
+        if (existingPost.isEmpty()) {
+            throw new PostNotFoundException("Post with id " + postId + " Not Found");
+        }
+        Post postToUpdate = existingPost.get();
+        postToUpdate.setDescription(post.getDescription());
+        postRepository.save(postToUpdate);
+        return ResponseEntity.ok().body(postToUpdate);
+    }
+
+    @DeleteMapping("/users/{id}/posts/{post_id}")
+    public ResponseEntity<Object> deletePost(@PathVariable int postId) {
+        Optional<Post> existingPost = postRepository.findById(postId);
+        if (existingPost.isEmpty()) {
+            throw new PostNotFoundException("Post with id " + postId + " Not Found");
+        }
+        postRepository.deleteById(postId);
         return ResponseEntity.noContent().build();
     }
 }

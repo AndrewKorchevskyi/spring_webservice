@@ -7,7 +7,9 @@ import com.simplewebservice.etc.booksapi.Book;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
+@ApiIgnore
 @RestController
 public class FilteringController {
 
@@ -24,7 +26,6 @@ public class FilteringController {
 
         MappingJacksonValue mapping = new MappingJacksonValue(book);
         mapping.setFilters(filterProvider);
-
 
         return mapping;
     }

@@ -2,6 +2,7 @@ package com.simplewebservice.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -20,7 +21,7 @@ public class SwaggerConfig {
             "Andrew Korchevskyi", "https://github.com/AndrewKorchevskyi", "andrew.korchevskyi@gmail.com");
 
     public static final ApiInfo DEFAULT_API_INFO = new ApiInfo(
-            "Awesome API Title", "Simplewebservice API Description", "1.0",
+            "Simplewebservice API", "Simple API to create, update, delete users", "1.0",
             "urn:tos", DEFAULT_CONTACT,
             "Apache 2.0", "http://www.apache.org/licenses/LICENSE-2.0", Arrays.asList());
 
@@ -33,6 +34,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(DEFAULT_API_INFO)
                 .produces(DEFAULT_PRODUCES_AND_CONSUMES)
-                .consumes(DEFAULT_PRODUCES_AND_CONSUMES);
+                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.simplewebservice")).build();
     }
 }
