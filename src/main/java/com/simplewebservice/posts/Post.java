@@ -20,6 +20,12 @@ public class Post {
     @JsonIgnore
     private User user;
 
+    public Post() {}
+
+    public Post(String description) {
+        this.description = description;
+    }
+
     public int getId() {
         return id;
     }

@@ -2,6 +2,7 @@ package com.simplewebservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.simplewebservice.posts.Post;
 import com.simplewebservice.users.User;
 import com.simplewebservice.users.UserController;
 import org.junit.jupiter.api.Test;
@@ -54,8 +55,40 @@ public class SimpleWebserviceApplicationTests {
 	}
 
 	@Test
-	public void deleteUserById() {
+	public void deleteUser() {
 		User user = userController.createUser(new User("UserToDelete", new Date())).getBody();
 		assertThat(userController.deleteUser(user.getId()).getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+	}
+
+	@Test
+	public void createPost() {
+		User user = userController.createUser(new User("UserWithPost", new Date())).getBody();
+		Post userPost = new Post("User Post Description");
+		Post userPostCreated = userController.createPost(user.getId(), userPost).getBody();
+		assertThat(userPostCreated.getId()).isNotNull();
+		assertThat(userPostCreated.getDescription()).isEqualTo(userPost.getDescription());
+		userController.deletePost(userPostCreated.getId());
+		userController.deleteUser(user.getId());
+	}
+
+	@Test
+	public void updatePost() {
+		User user = userController.createUser(new User("UserWithPost", new Date())).getBody();
+		Post userPost = new Post("User Post Description");
+		Post userPostCreated = userController.createPost(user.getId(), userPost).getBody();
+		userPost.setDescription("User Post Updated Description");
+		Post updatedPost = userController.updatePost(userPostCreated.getId(), userPost).getBody();
+		assertThat(userPost.getDescription()).isEqualTo(updatedPost.getDescription());
+		userController.deletePost(updatedPost.getId());
+		userController.deleteUser(user.getId());
+	}
+
+	@Test
+	public void deletePost() {
+		User user = userController.createUser(new User("UserWithPost", new Date())).getBody();
+		Post userPost = new Post("User Post Description");
+		Post userPostCreated = userController.createPost(user.getId(), userPost).getBody();
+		assertThat(userController.deletePost(userPostCreated.getId()).getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+		userController.deleteUser(user.getId());
 	}
 }

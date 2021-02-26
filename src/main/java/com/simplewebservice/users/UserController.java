@@ -87,19 +87,19 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/posts/{post_id}")
-    public Post retrievePostById(@PathVariable int post_id) {
-        Optional<Post> existingPost = postRepository.findById(post_id);
+    public Post retrievePostById(@PathVariable int postId) {
+        Optional<Post> existingPost = postRepository.findById(postId);
         if (existingPost.isEmpty()) {
-            throw new PostNotFoundException("Post with id " + post_id + " Not Found");
+            throw new PostNotFoundException("Post with id " + postId + " Not Found");
         }
         return existingPost.get();
     }
 
     @PostMapping("/users/{id}/posts")
-    public ResponseEntity<Post> createPost(@PathVariable int id, @RequestBody Post post) {
-        Optional<User> user = userRepository.findById(id);
+    public ResponseEntity<Post> createPost(@PathVariable int userId, @RequestBody Post post) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            throw new UserNotFoundException("User with id " + id + " Not Found");
+            throw new UserNotFoundException("User with id " + userId + " Not Found");
         }
         User userToCreatePost = user.get();
         post.setUser(userToCreatePost);
@@ -112,10 +112,10 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/posts/{post_id}")
-    public ResponseEntity<Post> updatePost(@PathVariable int post_id, @RequestBody Post post) {
-        Optional<Post> existingPost = postRepository.findById(post_id);
+    public ResponseEntity<Post> updatePost(@PathVariable int postId, @RequestBody Post post) {
+        Optional<Post> existingPost = postRepository.findById(postId);
         if (existingPost.isEmpty()) {
-            throw new PostNotFoundException("Post with id " + post_id + " Not Found");
+            throw new PostNotFoundException("Post with id " + postId + " Not Found");
         }
         Post postToUpdate = existingPost.get();
         postToUpdate.setDescription(post.getDescription());
@@ -124,12 +124,12 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}/posts/{post_id}")
-    public ResponseEntity<Object> deletePost(@PathVariable int post_id) {
-        Optional<Post> existingPost = postRepository.findById(post_id);
+    public ResponseEntity<Object> deletePost(@PathVariable int postId) {
+        Optional<Post> existingPost = postRepository.findById(postId);
         if (existingPost.isEmpty()) {
-            throw new PostNotFoundException("Post with id " + post_id + " Not Found");
+            throw new PostNotFoundException("Post with id " + postId + " Not Found");
         }
-        postRepository.deleteById(post_id);
+        postRepository.deleteById(postId);
         return ResponseEntity.noContent().build();
     }
 }
